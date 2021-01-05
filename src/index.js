@@ -26,9 +26,11 @@ const reducer = (state = [], action) => {  // return 되는 것들은 store에 �
   console.log("state", state) // 파라미터로 들어간 state = [] 은 정말 처음 시작할 때의 설정 값이고, action으로 변경된 값이 state값으로 변경되는 것을 확인할 수 있다.
   switch (action.type) {
     case ADD_TODO:
-      return [{ text: action.text, id: Date.now() }, ...state];  // 원형 배열이 절대 변형되면 안된다.(immutable), .text는 29번줄으로부터 왔음.
+      const newTodoObj = { text: action.text, id: Date.now() };
+      return [newTodoObj, ...state];  // 원형 배열이 절대 변형되면 안된다.(redux의 rule은 state가 immutable!!), .text는 29번줄으로부터 왔음.
     case DELETE_TODO:
-      return state.filter(toDo => toDo.id !== action.id);  // 원형 배열을 변형시키면 안되므로 filter를 사용함. & reducer이 초깃값 호출 1번, action으로 변형된 값(dispatch함수에서 전달된 id) 1번 총 2번 호출되는 것을 이용 => action.id값도 두번째 호출될 때 새롭게 적용될 것. cf) action은 55번째 btn 클릭이벤트로 dispatch가 되면서 reducer함수가 불려와지면서 실행될 것임
+      const cleaned = state.filter(toDo => toDo.id !== action.id);
+      return cleaned; // 원형 배열을 변형시키면 안되므로 filter를 사용함. & reducer이 초깃값 호출 1번, action으로 변형된 값(dispatch함수에서 전달된 id) 1번 총 2번 호출되는 것을 이용 => action.id값도 두번째 호출될 때 새롭게 적용될 것. cf) action은 55번째 btn 클릭이벤트로 dispatch가 되면서 reducer함수가 불려와지면서 실행될 것임
     default:                                               // 같지 않다면 true로 살아남고, 같다면 false로 버려질 것임, "같다면 false"를 이용한 것.
       return state;
   }
@@ -81,3 +83,8 @@ const onSubmit = e => {
 };
 
 form.addEventListener("submit", onSubmit);
+
+/*
+  정리
+Redux는 하나의 function이다!
+*/
