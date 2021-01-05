@@ -14,7 +14,7 @@ const addToDo = text => {   // 파라미터인 text에 추후 새로 작성된 t
     text
   };
 };
-const deleteToDo = id => {
+const deleteToDo = id => {  // 아래 dispatch 함수화한 곳에서 파라미터를 id로 받고, id의 할당까지 할 것. 그 id를 사용할 예정
   return {
     type: DELETE_TODO,
     id
@@ -33,15 +33,48 @@ const reducer = (state = [], action) => {
   }
 };
 
+
 const store = createStore(reducer);
 
+// action을 reducer 함수에 전달하기
+const dispatchAddToDo = text => {  // text는 onSubmit에서 설정이 될 것임.
+  store.dispatch(addToDo(text));
+};
+const dispatchDeleteToDo = e => {
+  const id = e.target.parentNode.id;
+  store.dispatch(deleteToDo(id))
+};
+
+const paintToDos = () => {
+  const toDos = store.getState();
+  ul.innerText = ""; // 새로운 todo를 생성할 때마다 ul태그 초기화 (초기화 안하면 기존 todo가 새로운 todo와 같이 또 추가됨.)
+  toDos.forEach(toDo => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.innerText = "삭제";
+    btn.addEventListener("click", dispatchDeleteToDo); // reducer 함수 내에서 액션까지 실행시킬것임.
+    li.id = toDo.id; // toDo는 forEach toDos의 각 item이고, id는 ADD_TODO action 함수에서 지정한 것.
+    li.innerText = toDo.text;
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+
+// paintTodos가 store에서 변화되고 있는 것을 살펴보자
+// 구독을 안하면 렌더자체가 안됨.
+store.subscribe(paintToDos);
+
+
+store.subscribe(() => console.log(store.getState()));
 
 const onSubmit = e => {
   e.preventDefault();
 
   const toDo = input.value;
   input.value = ""  // 다시 초기화
-  store.dipatch({ type: ADD_TODO, text: toDo }); // reducer의 action으로 전달이 되어 새로운 인풋밸류로 상태를 업데이트 시킬 것임.
+  // reducer의 action으로 전달이 되어 새로운 인풋밸류로 상태를 업데이트 시킬 것임.
+  // store.dispatch({ type: ADD_TODO, text: toDo }); 
+  dispatchAddToDo(toDo);
 };
 
 form.addEventListener("submit", onSubmit);
