@@ -10,7 +10,7 @@ const reducer = (state = [], action) => {
   // console.log(action)
   switch (action.type) {
     case ADD_TODO:
-      return [];
+      return [...state, { text: action.text, id: Date.now() }];  // 원형 배열이 절대 변형되면 안된다.(immutable), .text는 29번줄으로부터 왔음.
     case DELETE_TODO:
       return [];
     default:
